@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Number Generation Game</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin-top: 50px;
+        }
+        #progress-container {
+            width: 100%;
+            background-color: #f3f3f3;
+            border-radius: 5px;
+            margin-top: 10px;
+            margin-bottom: 10px;
+        }
+        #progress-bar {
+            width: 100%;
+            height: 20px;
+            background-color: #4caf50;
+            border-radius: 5px;
+        }
+        #number-input {
+            font-size: 24px;
+            padding: 10px;
+        }
+        .correct {
+            color: green;
+            animation: flashGreen 1s forwards;
+        }
+        .incorrect {
+            color: red;
+            animation: flashRed 1s forwards;
+        }
+        @keyframes flashGreen {
+            from { background-color: #fff; }
+            to { background-color: #00ff00; }
+        }
+        @keyframes flashRed {
+            from { background-color: #fff; }
+            to { background-color: #ff0000; }
+        }
+        #pause-btn, #progress-container, #number-input {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+<h1>Number Game</h1>
+
+<label for="min-range">Min Range:</label>
+<input type="number" id="min-range" value="1">
+
+<label for="max-range">Max Range:</label>
+<input type="number" id="max-range" value="100">
+
+<label for="language">Language:</label>
+<select id="language">
+    <option value="en-US">English (US)</option>
+    <option value="zh-CN">Chinese (Mandarin)</option>
+    <option value="de-DE">German</option>
+    <!-- Add more languages as desired -->
+</select>
+
+<br><br>
+
+<label for="countdown-time">Countdown (seconds):</label>
+<input type="number" id="countdown-time" value="10">
+
+<div id="progress-container">
+    <div id="progress-bar"></div>
+</div>
+
+<button id="start-btn">Start</button>
+<button id="pause-btn">Pause</button>
+
+<p>Enter the number spoken:</p>
+<input type="text" id="number-input">
+
+<p id="feedback"></p>
+<p id="correct-number" style="color: red;"></p>
+
+<script>
+    let countdownTime = document.getElementById("countdown-time").value;
+    let progressBar = document.getElementById("progress-bar");
+    let pause = false;
+    let countdownInterval;
+    let spokenNumber;
+    let isPaused = false;
+    let gameStarted = false;
+
+    document.getElementById("start-btn").addEventListener("click", () => {
+        gameStarted = true;
+        document.getElementById("start-btn").style.display = "none";
+        document.getElementById("pause-btn").style.display = "inline-block";
+        document.getElementById("number-input").style.display = "inline-block";
+        document.getElementById("progress-container").style.display = "block";
+        nextNumber();
+    });
+
+    document.getElementById("pause-btn").addEventListener("click", () => {
+        isPaused = !isPaused;
+        document.getElementById("pause-btn").innerText = isPaused ? "Resume" : "Pause";
+        if (isPaused) {
+            clearInterval(countdownInterval);
+        } else {
+            startCountdown();
+        }
+    });
+
+    document.getElementById("number-input").addEventListener("input", function(event) {
+        checkNumber();
+    });
+
+    function getRandomNumber(min, max) {
+        return Math.floor(Math.random() * (max - min + 1)) + min;
+    }
+
+    function speakNumber(number, lang) {
+        const utterance = new SpeechSynthesisUtterance(number);
+        utterance.lang = lang;
+        speechSynthesis.speak(utterance);
+    }
+
+    function startCountdown() {
+        clearInterval(countdownInterval);
+        let timeLeft = countdownTime;
+        progressBar.style.width = "100%";
+
+        countdownInterval = setInterval(() => {
+            if (timeLeft > 0 && !isPaused) {
+                timeLeft--;
+                let percentage = (timeLeft / countdownTime) * 100;
+                progressBar.style.width = percentage + "%";
+            } else if (timeLeft <= 0) {
+                clearInterval(countdownInterval);
+                document.getElementById("feedback").classList.add("incorrect");
+                document.getElementById("feedback").innerText = "Incorrect!";
+                document.getElementById("correct-number").innerText = "Correct number: " + spokenNumber;
+                setTimeout(nextNumber, 1000);
+            }
+        }, 1000);
+    }
+
+    function nextNumber() {
+        document.getElementById("feedback").innerText = "";
+        document.getElementById("feedback").classList = "";  // Clear previous feedback classes
+        document.getElementById("correct-number").innerText = "";
+        document.getElementById("number-input").value = "";  // Clear input field
+
+        let minRange = parseInt(document.getElementById("min-range").value);
+        let maxRange = parseInt(document.getElementById("max-range").value);
+        spokenNumber = getRandomNumber(minRange, maxRange);
+        let lang = document.getElementById("language").value;
+        speakNumber(spokenNumber, lang);
+        startCountdown();
+    }
+
+    function checkNumber() {
+        let userInput = parseInt(document.getElementById("number-input").value);
+        if (userInput === spokenNumber) {
+            document.getElementById("feedback").classList.add("correct");
+            document.getElementById("feedback").innerText = "Correct!";
+            clearInterval(countdownInterval);  // Stop countdown immediately
+            setTimeout(nextNumber, 1000);
+        } else if (!isNaN(userInput)) {
+            document.getElementById("feedback").classList.remove("correct", "incorrect");
+        }
+    }
+</script>
+
+</body>
+</html>
