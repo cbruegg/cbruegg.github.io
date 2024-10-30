@@ -255,12 +255,15 @@ fun MyAwesomeSdkFeature() {
 }
 ```
 
+For an easy overview, I've published the snippets above as a [GitHub Gist](https://gist.github.com/cbruegg/e954313c92c7fa835fe1c2ad70699876).
+You may have to apply small fixes such as adding missing imports.
+
 # Bonus Content
 
 ## Preventing usage of changed APIs
 
 As our internal SDK still depends on Compose 1.6, it is possible to accidentally call APIs that were broken with the update to Compose 1.7.
-To prevent this, we can learn from Tor Norbye's talk on how to [Write your own Kotlin lint checks](https://www.youtube.com/watch?v=q5q-y3eZTSA).
+To prevent this, we can learn from Tor Norbye's excellent talk on how to [_Write your own Kotlin lint checks_](https://www.youtube.com/watch?v=q5q-y3eZTSA).
 
 For example, we can ban direct calls to `ModalBottomSheet` by creating a Gradle module called `custom-lint-checks`:
 
@@ -349,5 +352,3 @@ dependencies {
 
 # TODOs
 - explain compose version detection (and how it differs for different Compose / compose material modules)
-- Mention more examples and show them side-by-side
-- Wrap up with a TLDR / copy-pasteable snippets
