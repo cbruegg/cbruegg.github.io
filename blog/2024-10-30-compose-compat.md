@@ -181,6 +181,32 @@ fun ModalBottomSheetCompat(
 }
 ```
 
+### The last piece of the puzzle
+
+If you copy and paste the code snippets above, you'll quickly notice that we haven't defined the value `runningOnCompose16` yet.
+
+Unfortunately the myriad of Compose libraries don't offer an easy and consistent way to detect their version _at runtime_. Let's build our own then!
+
+#### `compose-compat-on17`
+
+**VersionCheck.kt**
+
+```kotlin
+package composecompaton17
+
+val runningOnCompose16: Boolean =
+    try {
+        androidx.compose.material3.ripple(color = Color.Red)
+        false
+    } catch (e: LinkageError) {
+        true
+    }
+```
+
+The `ripple` function has been added in the Compose 1.7 version of the Material3 library. We try to call it.
+If the function does not actually exist at runtime, that means we're running in a Compose 1.6 environment.
+
+Goal achieved! Now we just need to import this value inside `compose-compat-on16`'s `ModalBottomSheetCompat.kt`.
 
 # TODOs
 - explain compose version detection (and how it differs for different Compose / compose material modules)
