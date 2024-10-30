@@ -127,7 +127,7 @@ The `compose-compat-on16` module defines the API of our compatibility layer. To 
 it also has an `implementation` dependency to Compose 1.6 and calls its APIs directly within a Compose 1.6 environment.
 
 When `compose-compat-on16` detects that it's running within a Compose 1.7 environment, it delegates to the `compose-compat-on17` module.
-To call Compose 1.7 APIs (without resorting to Reflection), it must depend on Compose 1.7.
+To call Compose 1.7 APIs (without resorting to Reflection), `compose-compat-on17` must depend on Compose 1.7.
 This has to be a `compileOnly` dependency, ensuring that no transitive dependency to Compose 1.7 exists for the host app.
 
 Let's take a look at the code.
