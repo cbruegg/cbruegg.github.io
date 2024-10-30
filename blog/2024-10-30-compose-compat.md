@@ -7,10 +7,40 @@ Compose 1.7 brings a few improvements, most notably performance benefits. Updati
 Say we're working on an internal SDK integrated into various apps. Updating to Compose 1.7 poses an interesting challenge: Who moves first?
 
 In the beginning I believed it doesn't matter. After opening our `libs.versions.toml` and bumping Compose to 1.7... we see build errors?
-It turns out that even though Compose 1.7 technically is only a minor version bump, in practice this is not necessarily the case.
+
+It turns out that even though Compose 1.7 technically is only a minor version bump, in practice there are **breaking changes**.
 In particular, this internal SDK uses many APIs that are marked as experimental in Compose 1.6.
 Google grants itself the liberty to change these APIs as they evolve. Unfortunately they do so without a deprecation cycle.
-This includes innocuous-looking APIs like `ModalBottomSheet`. It used to have a parameter `windowInsets: WindowInsets` that has changed to `contentWindowInsets: @Composable () -> WindowInsets` - a breaking change.
+
+This includes innocuous-looking APIs like `ModalBottomSheet`. It used to have a parameter `windowInsets: WindowInsets` that has changed to `contentWindowInsets: @Composable () -> WindowInsets` - a breaking change!
+
+This is what the API looked like before:
+
+```kotlin
+@Composable
+@ExperimentalMaterial3Api
+fun ModalBottomSheet(
+    // ...
+    windowInsets: WindowInsets = BottomSheetDefaults.windowInsets,
+    // ...
+) {
+    // ...
+}
+```
+
+And this is what it looks like in the Compose 1.7 artifacts:
+
+```kotlin
+@Composable
+@ExperimentalMaterial3Api
+fun ModalBottomSheet(
+    // ...
+    contentWindowInsets: @Composable () -> WindowInsets = { BottomSheetDefaults.windowInsets },
+    // ...
+) {
+    // ...
+}
+```
 
 ### Idea 1: The SDKs update first
 
@@ -75,7 +105,7 @@ the internal SDK has to declare a dependency to Compose 1.6. However, Compose 1.
 
 ### Setting up the Gradle module structure for our Compose Compatibility Layer
 
-Remember, the goal is to build a compatibility layer offering an API callable from Compose 1.6 *and* Compose 1.7 environments. This requires two Gradle modules: `compose-compat-on16` and `compose-compat-on17`.
+Remember, the goal is to build a compatibility layer offering an API callable from Compose 1.6 *and* Compose 1.7 environments. This requires creating two Gradle modules: `compose-compat-on16` and `compose-compat-on17`.
 
 ```mermaid
 graph TD
@@ -204,7 +234,8 @@ val runningOnCompose16: Boolean =
 ```
 
 The `ripple` function has been added in the Compose 1.7 version of the Material3 library. We try to call it.
-If the function does not actually exist at runtime, that means we're running in a Compose 1.6 environment.
+If the function does not actually exist at runtime, an error is thrown.
+We can catch it and derive that we're running in a Compose 1.6 environment.
 
 Goal achieved! Now we just need to import this value inside `compose-compat-on16`'s `ModalBottomSheetCompat.kt`.
 
@@ -227,10 +258,7 @@ fun MyAwesomeSdkFeature() {
 # TODOs
 - explain compose version detection (and how it differs for different Compose / compose material modules)
 - explain Gradle module structure, `compileOnly` trick.
-- Add code illustrations
 - Mention more examples and show them side-by-side
-- Confirm that examples I used really have been broken
-- Explain compat layer
 - Explain that experimental APIs in Compose are hard to avoid
 - Lint rules
 - Show evidence for widespread experimental API usage: https://github.com/search?q=%40OptIn%28Experimentalfoundationapi%3A%3Aclass%29&type=code
