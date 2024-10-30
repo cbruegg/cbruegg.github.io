@@ -10,7 +10,9 @@ In the beginning I believed it doesn't matter. After opening our `libs.versions.
 
 It turns out that even though Compose 1.7 technically is only a minor version bump, in practice there are **breaking changes**.
 In particular, this internal SDK uses many APIs that are marked as experimental in Compose 1.6.
-Google grants itself the liberty to change these APIs as they evolve. Unfortunately they do so without a deprecation cycle.
+Google grants itself the liberty to change these APIs as they evolve. Unfortunately they do so **without a deprecation cycle**.
+
+This would be fine if experimental APIs were easy to avoid in Compose. [This is not the case.](https://github.com/search?q=%40OptIn%28Experimentalfoundationapi%3A%3Aclass%29&type=code)
 
 This includes innocuous-looking APIs like `ModalBottomSheet`. It used to have a parameter `windowInsets: WindowInsets` that has changed to `contentWindowInsets: @Composable () -> WindowInsets` - a breaking change!
 
@@ -22,7 +24,6 @@ This is what the API looked like before:
 fun ModalBottomSheet(
     // ...
     windowInsets: WindowInsets = BottomSheetDefaults.windowInsets,
-    // ...
 ) {
     // ...
 }
@@ -36,7 +37,6 @@ And this is what it looks like in the Compose 1.7 artifacts:
 fun ModalBottomSheet(
     // ...
     contentWindowInsets: @Composable () -> WindowInsets = { BottomSheetDefaults.windowInsets },
-    // ...
 ) {
     // ...
 }
@@ -349,8 +349,5 @@ dependencies {
 
 # TODOs
 - explain compose version detection (and how it differs for different Compose / compose material modules)
-- explain Gradle module structure, `compileOnly` trick.
 - Mention more examples and show them side-by-side
-- Explain that experimental APIs in Compose are hard to avoid
-- Show evidence for widespread experimental API usage: https://github.com/search?q=%40OptIn%28Experimentalfoundationapi%3A%3Aclass%29&type=code
 - Wrap up with a TLDR / copy-pasteable snippets
