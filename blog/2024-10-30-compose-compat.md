@@ -4,11 +4,11 @@ Compose 1.7 brings a few improvements, most notably performance benefits. Updati
 
 ## Updating to Compose 1.7: Who moves first?
 
-I'm working on a set of internal SDKs integrated into various apps. Updating to Compose 1.7 posed an interesting challenge: Who moves first?
+Say we're working on an internal SDK integrated into various apps. Updating to Compose 1.7 poses an interesting challenge: Who moves first?
 
-In the beginning I believed it doesn't matter, so I opened our `libs.versions.toml`, bumped Compose to 1.7 and voilà... build errors?
+In the beginning I believed it doesn't matter. After opening our `libs.versions.toml` and bumping Compose to 1.7... we see build errors?
 It turns out that even though Compose 1.7 technically is only a minor version bump, in practice this is not necessarily the case.
-In particular, the internal SDKs I'm working on use many APIs that are marked as experimental in Compose 1.6.
+In particular, this internal SDK uses many APIs that are marked as experimental in Compose 1.6.
 Google grants itself the liberty to change these APIs as they evolve. Unfortunately they do so without a deprecation cycle.
 This includes innocuous-looking APIs like `ModalBottomSheet`. It used to have a parameter `windowInsets: WindowInsets` that has changed to `contentWindowInsets: @Composable () -> WindowInsets` - a breaking change.
 
@@ -17,8 +17,7 @@ This includes innocuous-looking APIs like `ModalBottomSheet`. It used to have a 
 This is a problem. Let's assume both the internal SDK as well as the host app use the `ModalBottomSheet` component.
 If the internal SDK updates to Compose 1.7 first, this causes a transitive dependency for the host app to Compose 1.7 as well.
 As the app is still using the Compose 1.6-version of `ModalBottomSheet`, the app's call to this composable is now broken, forcing
-the app's development team to immediately work on restoring Compose 1.7 compatibility. As an SDK developer, this is not a situation I want
-to put an app developer in.
+the app's development team to immediately work on restoring Compose 1.7 compatibility. As an SDK developer, this is not a situation I want to put an app developer in.
 
 ### Idea 2: Wait for the host apps to update
 
@@ -70,9 +69,13 @@ fun ModalBottomSheetCompat(
 }
 ```
 
+Maybe you've already noticed: This snippet can't actually be compiled. To not force the app to Compose 1.7 through a transitive dependency,
+the internal SDK has to declare a dependency to Compose 1.6. However, Compose 1.6 does not have an overload of
+`ModalBottomSheet` with a `contentWindowInsets` parameter, so the function call cannot be resolved by the compiler.
+
 # TODOs
 - explain compose version detection (and how it differs for different Compose / compose material modules)
-- explain Gradle module structure
+- explain Gradle module structure, `compileOnly` trick.
 - Add code illustrations
 - Mention more examples and show them side-by-side
 - Confirm that examples I used really have been broken
