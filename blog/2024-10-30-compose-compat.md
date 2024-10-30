@@ -32,7 +32,7 @@ In many organizations, this is not desirable.
 
 Not updating is not an option - so how can we escape from this trap?
 
-As an Android dev, the solution is actually right before our eyes. For calling Android framework APIs, the
+As an Android developer, the solution is actually right before our eyes. For calling Android framework APIs, the
 Android SDK itself offers a way to call different APIs depending on the system version the app is running on. Code like the following is a frequent sight:
 
 ```kotlin
@@ -207,6 +207,22 @@ The `ripple` function has been added in the Compose 1.7 version of the Material3
 If the function does not actually exist at runtime, that means we're running in a Compose 1.6 environment.
 
 Goal achieved! Now we just need to import this value inside `compose-compat-on16`'s `ModalBottomSheetCompat.kt`.
+
+# Wrapping up
+
+We've now successfully implemented a `ModalBottomSheetCompat` component that can be called safely from our SDK code.
+It can be run in a Compose 1.6 environment as well as a Compose 1.7 environment, all without forcing the host app
+to update to Compose 1.7 itself.
+
+```kotlin
+@Composable
+@OptIn(ExperimentalMaterial3Api::class)
+fun MyAwesomeSdkFeature() {
+    ModalBottomSheetCompat(
+        contentWindowInsets = { /* ... */ }
+    )
+}
+```
 
 # TODOs
 - explain compose version detection (and how it differs for different Compose / compose material modules)
