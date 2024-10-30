@@ -73,6 +73,28 @@ Maybe you've already noticed: This snippet can't actually be compiled. To not fo
 the internal SDK has to declare a dependency to Compose 1.6. However, Compose 1.6 does not have an overload of
 `ModalBottomSheet` with a `contentWindowInsets` parameter, so the function call cannot be resolved by the compiler.
 
+### Setting up the Gradle module structure for our Compose Compatibility Layer
+
+Remember, the goal is to build a compatibility layer offering an API callable from Compose 1.6 *and* Compose 1.7 environments. This requires two Gradle modules: `compose-compat-on16` and `compose-compat-on17`.
+
+```mermaid
+graph TD
+  SDK -- implementation --> compose-compat-on16
+  compose-compat-on16 -- implementation --> Compose_1_6
+  compose-compat-on16 -- implementation --> compose-compat-on17
+  compose-compat-on17 -- compileOnly --> Compose_1_7
+
+  classDef composeClass fill:#f9f,stroke:#333,stroke-width:2px;
+
+  Compose_1_6[Compose 1.6]:::composeClass
+  Compose_1_7[Compose 1.7]:::composeClass
+  SDK[SDK]
+  compose-compat-on16[compose-compat-on16]
+  compose-compat-on17[compose-compat-on17]
+```
+
+
+
 # TODOs
 - explain compose version detection (and how it differs for different Compose / compose material modules)
 - explain Gradle module structure, `compileOnly` trick.
