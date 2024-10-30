@@ -13,7 +13,7 @@ Google grants itself the liberty to change these APIs as they evolve. Unfortunat
 This includes innocuous-looking APIs like `HorizontalPager`. Its parameter `flingBehavior` used to be `SnapFlingBehavior`
 and now requires a `TargetedFlingBehavior` - a breaking change.
 
-## Idea 1: The SDKs update first
+### Idea 1: The SDKs update first
 
 This is a problem. Let's assume both the internal SDK as well as the host app use the `HorizontalPager` component.
 If the internal SDK updates to Compose 1.7 first, this causes a transitive dependency for the host app to Compose 1.7 as well.
@@ -21,7 +21,7 @@ As the app is still using the Compose 1.6-version of `HorizontalPager`, the app'
 the app's development team to immediately work on restoring Compose 1.7 compatibility. As an SDK developer, this is not a situation I want
 to put an app developer in.
 
-## Idea 2: Wait for the host apps to update
+### Idea 2: Wait for the host apps to update
 
 Unfortunately we also can't just wait for the host app to upgrade to Compose 1.7. As there can only be a single Compose version on the classpath,
 the moment the app depends on Compose 1.7, our SDKs would cause runtime crashes as they are trying to call Compose 1.6-APIs that are no longer available
