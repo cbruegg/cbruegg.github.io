@@ -247,6 +247,19 @@ We've now successfully implemented a `ModalBottomSheetCompat` component that can
 It can be run in a Compose 1.6 environment as well as a Compose 1.7 environment, all without forcing the host app
 to update to Compose 1.7 itself.
 
+We just add a dependency from our SDK module to our compatibility module:
+
+**sdk/build.gradle.kts**
+```kotlin
+dependencies {
+    implementation(project(":compose-compat-on16"))
+    // Other Compose 1.6 dependencies here
+}
+```
+
+And now we can use out compatibility function:
+
+**sdk/src/main/kotlin/MyAwesomeSdkFeature.kt**
 ```kotlin
 @Composable
 @OptIn(ExperimentalMaterial3Api::class)
