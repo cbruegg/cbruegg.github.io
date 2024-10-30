@@ -10,14 +10,13 @@ In the beginning I believed it doesn't matter, so I opened our `libs.versions.to
 It turns out that even though Compose 1.7 technically is only a minor version bump, in practice this is not necessarily the case.
 In particular, the internal SDKs I'm working on use many APIs that are marked as experimental in Compose 1.6.
 Google grants itself the liberty to change these APIs as they evolve. Unfortunately they do so without a deprecation cycle.
-This includes innocuous-looking APIs like `HorizontalPager`. Its parameter `flingBehavior` used to be `SnapFlingBehavior`
-and now requires a `TargetedFlingBehavior` - a breaking change.
+This includes innocuous-looking APIs like `ModalBottomSheet`. It used to have a parameter `windowInsets: WindowInsets` that has changed to `contentWindowInsets: @Composable () -> WindowInsets` - a breaking change.
 
 ### Idea 1: The SDKs update first
 
-This is a problem. Let's assume both the internal SDK as well as the host app use the `HorizontalPager` component.
+This is a problem. Let's assume both the internal SDK as well as the host app use the `ModalBottomSheet` component.
 If the internal SDK updates to Compose 1.7 first, this causes a transitive dependency for the host app to Compose 1.7 as well.
-As the app is still using the Compose 1.6-version of `HorizontalPager`, the app's call to this composable is now broken, forcing
+As the app is still using the Compose 1.6-version of `ModalBottomSheet`, the app's call to this composable is now broken, forcing
 the app's development team to immediately work on restoring Compose 1.7 compatibility. As an SDK developer, this is not a situation I want
 to put an app developer in.
 
@@ -30,9 +29,54 @@ or changed in Compose 1.7.
 Using a naive approach, all internal and external modules using experimental Compose APIs of an app have to move to Compose 1.7 at the same time.
 In many organizations, this is not desirable.
 
+## The way out
+
+Not updating is not an option - so how can we escape from this trap?
+
+As an Android dev, the solution is actually right before our eyes. For calling Android framework APIs, the
+Android SDK itself offers a way to call different APIs depending on the system version the app is running on. Code like the following is a frequent sight:
+
+```kotlin
+ val color = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+    resources.getColor(R.color.colorPrimary, null)
+} else {
+    resources.getColor(R.color.colorPrimary)
+}
+```
+
+What if we could do the same for Compose APIs?
+
+The solution is a compatibility layer that calls Compose 1.6 APIs when Compose 1.6 is on the classpath
+and Compose 1.7 APIs when Compose 1.7 is on the classpath. Let's get started:
+
+```kotlin
+@Composable
+fun ModalBottomSheetCompat(
+    contentWindowInsets: @Composable () -> WindowInsets = { BottomSheetDefaults.windowInsets },
+    // ...
+) {
+    if (runningOnCompose16) {
+        androidx.compose.material3.ModalBottomSheet(
+            windowInsets = contentWindowInsets(),
+            // ...
+        )
+    } else {
+        // We're on Compose 1.7 or higher
+        androidx.compose.material3.ModalBottomSheet(
+            contentWindowInsets = contentWindowInsets,
+            // ...
+        )
+    }
+}
+```
+
 # TODOs
+- explain compose version detection (and how it differs for different Compose / compose material modules)
+- explain Gradle module structure
+- Add code illustrations
 - Mention more examples and show them side-by-side
 - Confirm that examples I used really have been broken
 - Explain compat layer
+- Explain that experimental APIs in Compose are hard to avoid
 - Lint rules
 - Show evidence for widespread experimental API usage: https://github.com/search?q=%40OptIn%28Experimentalfoundationapi%3A%3Aclass%29&type=code
