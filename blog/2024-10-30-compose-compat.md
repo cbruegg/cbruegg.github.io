@@ -260,6 +260,29 @@ You may have to apply small fixes such as adding missing imports.
 
 # Bonus Content
 
+## Version checks for other artifacts
+
+Not only the Material3 library has seen breaking changes. In fact, even the `androidx.compose.foundation` module has breaking changes.
+If your code is affected by breaking changes in more than one Compose module, you have to define multiple `runningOnCompose16` values.
+
+For example, you can detect the version of the foundation module by placing this check in `compose-compat-on16`:
+
+```kotlin
+@OptIn(ExperimentalFoundationApi::class)
+val isFoundationCompose16: Boolean =
+    try {
+        AnchoredDraggableState(
+            initialValue = Unit,
+            positionalThreshold = { it },
+            velocityThreshold = { 0f },
+            animationSpec = SnapSpec(),
+        )
+        true
+    } catch (e: LinkageError) {
+        false
+    }
+```
+
 ## Preventing usage of changed APIs
 
 As our internal SDK still depends on Compose 1.6, it is possible to accidentally call APIs that were broken with the update to Compose 1.7.
@@ -349,6 +372,3 @@ dependencies {
     // ...
 }
 ```
-
-# TODOs
-- explain compose version detection (and how it differs for different Compose / compose material modules)
