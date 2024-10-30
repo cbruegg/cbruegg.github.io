@@ -93,6 +93,93 @@ graph TD
   compose-compat-on17[compose-compat-on17]
 ```
 
+The `compose-compat-on16` module defines the API of our compatibility layer. To keep the structure simple,
+it also has an `implementation` dependency to Compose 1.6 and calls its APIs directly within a Compose 1.6 environment.
+
+When `compose-compat-on16` detects that it's running within a Compose 1.7 environment, it delegates to the `compose-compat-on17` module.
+To call Compose 1.7 APIs (without resorting to Reflection), it must depend on Compose 1.7.
+This has to be a `compileOnly` dependency, ensuring that no transitive dependency to Compose 1.7 exists for the host app.
+
+Let's take a look at the code.
+
+#### `compose-compat-on16`
+
+**build.gradle.kts**
+```kotlin
+plugins {
+    // ...
+}
+
+android {
+    // ...
+}
+
+dependencies {
+    implementation(":compose-compat-on17")
+    implementation("androidx.compose.material3:material3:1.2.1") // Compose 1.6
+}
+```
+
+**ModalBottomSheetCompat.kt**
+```kotlin
+package composecompaton16
+
+@Composable
+@ExperimentalMaterial3Api
+fun ModalBottomSheetCompat(
+    contentWindowInsets: @Composable () -> WindowInsets = { BottomSheetDefaults.windowInsets },
+    // ...
+) {
+    if (runningOnCompose16) {
+        androidx.compose.material3.ModalBottomSheet(
+            // Obtain WindowInsets by just calling contentWindowInsets for its return value
+            windowInsets = contentWindowInsets(),
+            // ...
+        )
+    } else {
+        // We're on Compose 1.7 or higher -> Delegate to the compose-compat-on17 module
+        composecompaton17.ModalBottomSheetCompat(
+            contentWindowInsets = contentWindowInsets,
+            // ...
+        )
+    }
+}
+```
+
+#### `compose-compat-on17`
+
+**build.gradle.kts**
+```kotlin
+plugins {
+    // ...
+}
+
+android {
+    // ...
+}
+
+dependencies {
+    compileOnly("androidx.compose.material3:material3:1.3.0") // Compose 1.7
+}
+```
+
+**ModalBottomSheetCompat.kt**
+```kotlin
+package composecompaton17
+
+@Composable
+@ExperimentalMaterial3Api
+fun ModalBottomSheetCompat(
+    contentWindowInsets: @Composable () -> WindowInsets = { BottomSheetDefaults.windowInsets },
+    // ...
+) {
+    // In this module the call resolves successfully!
+    androidx.compose.material3.ModalBottomSheet(
+        contentWindowInsets = contentWindowInsets(),
+        // ...
+    )
+}
+```
 
 
 # TODOs
@@ -105,3 +192,4 @@ graph TD
 - Explain that experimental APIs in Compose are hard to avoid
 - Lint rules
 - Show evidence for widespread experimental API usage: https://github.com/search?q=%40OptIn%28Experimentalfoundationapi%3A%3Aclass%29&type=code
+- Wrap up with a TLDR / copy-pasteable snippets
