@@ -377,7 +377,7 @@ In our SDK module, we can now add this lint check module to let Android Studio a
 
 ```kotlin
 dependencies {
-    lintChecks(project(":cat-f:custom-lint-checks"))
+    lintChecks(project(":custom-lint-checks"))
     // ...
 }
 ```
