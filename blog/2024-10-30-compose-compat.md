@@ -258,6 +258,15 @@ fun MyAwesomeSdkFeature() {
 For an easy overview, I've published the snippets above as a [GitHub Gist](https://gist.github.com/cbruegg/e954313c92c7fa835fe1c2ad70699876).
 You may have to apply small fixes such as adding missing imports.
 
+# A plea to Google
+
+Marking experimental APIs as such makes a lot of sense - and so does letting their API evolve more radically.
+Developers using them should be aware that they may need to react fast to changes.
+However, using and generating feedback for experimental APIs in real applications and libraries is only possible when developers are given the _chance_ to react to changes.
+
+As this blog post shows, breaking ABI changes in a minor version bump make this challenging.
+That doesn't mean experimental APIs need to be maintained forever - but maybe just drop them one release later.
+
 # Bonus Content
 
 ## Version checks for other artifacts
