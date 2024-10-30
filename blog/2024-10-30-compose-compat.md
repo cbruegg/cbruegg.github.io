@@ -145,7 +145,7 @@ android {
 }
 
 dependencies {
-    implementation(":compose-compat-on17")
+    implementation(project(":compose-compat-on17"))
     implementation("androidx.compose.material3:material3:1.2.1") // Compose 1.6
 }
 ```
@@ -255,11 +255,102 @@ fun MyAwesomeSdkFeature() {
 }
 ```
 
+# Bonus Content
+
+## Preventing usage of changed APIs
+
+As our internal SDK still depends on Compose 1.6, it is possible to accidentally call APIs that were broken with the update to Compose 1.7.
+To prevent this, we can learn from Tor Norbye's talk on how to [Write your own Kotlin lint checks](https://www.youtube.com/watch?v=q5q-y3eZTSA).
+
+For example, we can ban direct calls to `ModalBottomSheet` by creating a Gradle module called `custom-lint-checks`:
+
+**build.gradle.kts**
+```kotlin
+plugins {
+    id("kotlin")
+}
+
+dependencies {
+    compileOnly("com.android.tools.lint:lint-api:31.7.1")
+}
+
+tasks.withType<Jar> {
+    manifest {
+        attributes("Lint-Registry-v2" to "com.example.Registry")
+    }
+}
+```
+
+**Registry.kt**
+```kotlin
+package com.example
+
+class Registry : IssueRegistry() {
+    override val issues: List<Issue> = listOf(Compose16UsageDetector.ISSUE)
+
+    override val api: Int = CURRENT_API
+
+    override val minApi: Int = CURRENT_API
+
+    override val vendor = Vendor(
+        vendorName = "...",
+        contact = "...",
+    )
+}
+```
+
+**Compose16UsageDetector.kt**
+```kotlin
+class Compose16UsageDetector :
+    Detector(),
+    SourceCodeScanner {
+
+    companion object Issues {
+        val ISSUE = Issue.create(
+            id = "Compose16Usage",
+            briefDescription = "Disallow use of Compose APIs that have been changed in Compose 1.7",
+            explanation = "...",
+            category = Category.CORRECTNESS,
+            severity = Severity.FATAL,
+            implementation = Implementation(
+                Compose16UsageDetector::class.java,
+                Scope.JAVA_FILE_SCOPE,
+            ),
+        )
+    }
+
+    override fun getApplicableMethodNames() = listOf("ModalBottomSheet")
+
+    override fun visitMethodCall(context: JavaContext, node: UCallExpression, method: PsiMethod) {
+        val cls = method.containingClass?.qualifiedName ?: return
+        val fn = node.methodName
+        if (cls.startsWith("androidx.compose.material3.ModalBottomSheet") && fn == "ModalBottomSheet") {
+            // startsWith as in Compose 1.6 the actual containing class file is ModalBottomSheet_androidKt (KMP convention)
+            val message = "API changed in Compose 1.7. This call will crash in apps using Compose 1.7!"
+            context.report(
+                issue = ISSUE,
+                scope = node,
+                location = context.getLocation(node),
+                message = message,
+            )
+        }
+    }
+}
+```
+
+In our SDK module, we can now add this lint check module to let Android Studio and Gradle's `lint` task pick up the rule:
+
+```kotlin
+dependencies {
+    lintChecks(project(":cat-f:custom-lint-checks"))
+    // ...
+}
+```
+
 # TODOs
 - explain compose version detection (and how it differs for different Compose / compose material modules)
 - explain Gradle module structure, `compileOnly` trick.
 - Mention more examples and show them side-by-side
 - Explain that experimental APIs in Compose are hard to avoid
-- Lint rules
 - Show evidence for widespread experimental API usage: https://github.com/search?q=%40OptIn%28Experimentalfoundationapi%3A%3Aclass%29&type=code
 - Wrap up with a TLDR / copy-pasteable snippets
