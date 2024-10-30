@@ -42,9 +42,11 @@ fun ModalBottomSheet(
 }
 ```
 
+This is a problem. Let's assume both the internal SDK as well as the host app use the `ModalBottomSheet` component.
+Who should update to Compose 1.7 first?
+
 ### Idea 1: The SDK updates first
 
-This is a problem. Let's assume both the internal SDK as well as the host app use the `ModalBottomSheet` component.
 If the internal SDK updates to Compose 1.7 first, this causes a transitive dependency for the host app to Compose 1.7 as well.
 As the app is still using the Compose 1.6-version of `ModalBottomSheet`, the app's call to this composable is now broken, forcing
 the app's development team to immediately work on restoring Compose 1.7 compatibility. As an SDK developer, this is not a situation I want to put an app developer in.
