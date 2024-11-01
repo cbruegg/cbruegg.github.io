@@ -1,6 +1,6 @@
 title: "Christian Brüggemann"
 
-markdown: GFM
+markdown: kramdown
 
 plugins:
   - jekyll-relative-links
