@@ -1,6 +1,7 @@
 title: "Christian Brüggemann"
 
 markdown: kramdown
+highlighter: rouge
 
 plugins:
   - jekyll-relative-links
