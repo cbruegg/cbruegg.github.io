@@ -1,6 +1,6 @@
 ---
 layout: post
-title: @cbruegg
+title: "@cbruegg"
 ---
 
 # Hi!

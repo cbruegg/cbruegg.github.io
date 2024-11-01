@@ -1,6 +1,7 @@
 ---
 layout: post
 title: Unbreaking the changes in Compose 1.7
+mermaid: true
 ---
 
 # Unbreaking the changes in Compose 1.7
