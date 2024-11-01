@@ -12,3 +12,8 @@ include:
   - blog
   - static
   - "*.html"
+
+jekyll-spaceship:
+  mermaid-processor:
+    syntax:
+      code: 'mermaid'
