@@ -2,6 +2,7 @@
 layout: post
 title: Unbreaking the changes in Compose 1.7
 mermaid: true
+include_scripts: [ "https://cdn.jsdelivr.net/npm/mermaid@10.9.1/dist/mermaid.min.js" ]
 ---
 
 # Unbreaking the changes in Compose 1.7
@@ -115,7 +116,7 @@ the internal SDK has to declare a dependency to Compose 1.6. However, Compose 1.
 
 Remember, the goal is to build a compatibility layer offering an API callable from Compose 1.6 *and* Compose 1.7 environments. This requires creating two Gradle modules: `compose-compat-on16` and `compose-compat-on17`.
 
-<pre class="mermaid">
+```mermaid
 graph TD
   SDK -- implementation --> compose-compat-on16
   compose-compat-on16 -- implementation --> Compose_1_6
@@ -129,8 +130,7 @@ graph TD
   SDK[SDK]
   compose-compat-on16[compose-compat-on16]
   compose-compat-on17[compose-compat-on17]
-</pre>
-<script src="https://cdn.jsdelivr.net/npm/mermaid@10.9.1/dist/mermaid.min.js"></script>
+```
 
 The `compose-compat-on16` module defines the API of our compatibility layer. To keep the structure simple,
 it also has an `implementation` dependency to Compose 1.6 and calls its APIs directly within a Compose 1.6 environment.
