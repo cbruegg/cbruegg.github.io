@@ -18,3 +18,11 @@ jekyll-spaceship:
   mermaid-processor:
     syntax:
       code: 'mermaid'
+
+kramdown:
+  syntax_highlighter: rouge
+  syntax_highlighter_opts:
+    block:
+      line_numbers: false
+    span:
+      line_numbers: false
