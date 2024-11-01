@@ -1,4 +1,5 @@
 ---
+layout: default
 title: Unbreaking the changes in Compose 1.7
 ---
 

@@ -1,5 +1,6 @@
 ---
-title: "@cbruegg"
+layout: default
+title: "@cbruegg
 ---
 
 # Hi!
