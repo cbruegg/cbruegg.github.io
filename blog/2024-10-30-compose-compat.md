@@ -114,6 +114,16 @@ the internal SDK has to declare a dependency to Compose 1.6. However, Compose 1.
 
 Remember, the goal is to build a compatibility layer offering an API callable from Compose 1.6 *and* Compose 1.7 environments. This requires creating two Gradle modules: `compose-compat-on16` and `compose-compat-on17`.
 
+<div id="diagram">
+
+<style type="text/css">
+#diagram img {
+    max-height: 30em;
+    margin: 0 auto;
+    display: block;
+}
+</style>
+
 ```mermaid
 graph TD
   SDK -- implementation --> compose-compat-on16
@@ -129,6 +139,8 @@ graph TD
   compose-compat-on16[compose-compat-on16]
   compose-compat-on17[compose-compat-on17]
 ```
+
+</div>
 
 The `compose-compat-on16` module defines the API of our compatibility layer. To keep the structure simple,
 it also has an `implementation` dependency to Compose 1.6 and calls its APIs directly within a Compose 1.6 environment.
