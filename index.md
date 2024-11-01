@@ -1,6 +1,6 @@
 ---
 layout: default
-title: "@cbruegg
+title: "@cbruegg"
 ---
 
 # Hi!
