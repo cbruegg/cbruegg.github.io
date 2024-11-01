@@ -9,3 +9,6 @@ relative_links:
   collections: true
 include:
   - index.md
+  - blog
+  - static
+  - *.html

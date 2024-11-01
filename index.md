@@ -1,3 +1,8 @@
+---
+layout: post
+title: @cbruegg
+---
+
 # Hi!
 
 I'm Christian Brüggemann, an Android developer from Berlin, Germany. You may have a look at my GitHub profile [@cbruegg](https://github.com/cbruegg).

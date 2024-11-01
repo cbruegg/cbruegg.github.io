@@ -1,3 +1,8 @@
+---
+layout: post
+title: Unbreaking the changes in Compose 1.7
+---
+
 # Unbreaking the changes in Compose 1.7
 
 Compose 1.7 brings a few improvements, most notably performance benefits. Updating seems like a no-brainer - but unfortunately it's not always that easy!

@@ -40,8 +40,6 @@ jobs:
         with:
           source: ./
           destination: ./_site
-      - name: Merge blog with main data
-        run: mv static/* _site/static/ && mv *.html _site/
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
       - name: Deploy to GitHub Pages
