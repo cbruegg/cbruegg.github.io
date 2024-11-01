@@ -2,7 +2,6 @@
 layout: post
 title: Unbreaking the changes in Compose 1.7
 mermaid: true
-include_scripts: [ "https://cdn.jsdelivr.net/npm/mermaid@10.9.1/dist/mermaid.min.js" ]
 ---
 
 # Unbreaking the changes in Compose 1.7
