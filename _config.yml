@@ -13,6 +13,7 @@ include:
   - blog
   - static
   - "*.html"
+  - ".well-known"
 
 jekyll-spaceship:
   mermaid-processor:
